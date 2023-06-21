@@ -1,0 +1,138 @@
+ var tO = tI.prototype;
+        tO[eu] = !0,
+        tO[h] = tO.remove,
+        tO.removeAll = tO.deleteAll,
+        tO.setIn = ti,
+        tO.removeIn = tO.deleteIn = tf,
+        tO.update = ts,
+        tO.updateIn = to,
+        tO.merge = tO.concat = tu,
+        tO.mergeWith = tb,
+        tO.mergeDeep = t_,
+        tO.mergeDeepWith = tw,
+        tO.mergeIn = tM,
+        tO.mergeDeepIn = tk,
+        tO.withMutations = tE,
+        tO.wasAltered = tA,
+        tO.asImmutable = tx,
+        tO["@@transducer/init"] = tO.asMutable = tS,
+        tO["@@transducer/step"] = function(e, t) {
+            return e.set(t[0], t[1])
+        }
+        ,
+        tO["@@transducer/result"] = function(e) {
+            return e.asImmutable()
+        }
+        ;
+        var tC = function(e, t) {
+            this.ownerID = e,
+            this.entries = t
+        };
+        tC.prototype.get = function(e, t, a, r) {
+            for (var n = this.entries, i = 0, c = n.length; i < c; i++)
+                if (ep(a, n[i][0]))
+                    return n[i][1];
+            return r
+        }
+        ,
+        tC.prototype.update = function(e, t, a, r, n, i, c) {
+            for (var f = n === l, d = this.entries, s = 0, o = d.length; s < o && !ep(r, d[s][0]); s++)
+                ;
+            var u = s < o;
+            if (u ? d[s][1] === n : f)
+                return this;
+            if (g(c),
+            (f || !u) && g(i),
+            !f || 1 !== d.length) {
+                if (!u && !f && d.length >= t$)
+                    return function(e, t, a, r) {
+                        e || (e = new m);
+                        for (var n = new tN(e,ev(a),[a, r]), i = 0; i < t.length; i++) {
+                            var c = t[i];
+                            n = n.update(e, 0, void 0, c[0], c[1])
+                        }
+                        return n
+                    }(e, d, r, n);
+                var b = e && e === this.ownerID
+                  , h = b ? d : e0(d);
+                return (u ? f ? s === o - 1 ? h.pop() : h[s] = h.pop() : h[s] = [r, n] : h.push([r, n]),
+                b) ? (this.entries = h,
+                this) : new tC(e,h)
+            }
+        }
+        ;
+        var tR = function(e, t, a) {
+            this.ownerID = e,
+            this.bitmap = t,
+            this.nodes = a
+        };
+        tR.prototype.get = function(e, t, a, r) {
+            void 0 === t && (t = ev(a));
+            var n = 1 << ((0 === e ? t : t >>> e) & 31)
+              , i = this.bitmap;
+            return (i & n) == 0 ? r : this.nodes[tQ(i & n - 1)].get(e + 5, t, a, r)
+        }
+        ,
+        tR.prototype.update = function(e, t, a, r, n, i, c) {
+            void 0 === a && (a = ev(r));
+            var f = (0 === t ? a : a >>> t) & 31
+              , d = 1 << f
+              , s = this.bitmap
+              , o = (s & d) != 0;
+            if (!o && n === l)
+                return this;
+            var u = tQ(s & d - 1)
+              , b = this.nodes
+              , h = o ? b[u] : void 0
+              , p = tq(h, e, t + 5, a, r, n, i, c);
+            if (p === h)
+                return this;
+            if (!o && p && b.length >= tZ)
+                return function(e, t, a, r, n) {
+                    for (var i = 0, c = Array(32), f = 0; 0 !== a; f++,
+                    a >>>= 1)
+                        c[f] = 1 & a ? t[i++] : void 0;
+                    return c[r] = n,
+                    new tP(e,i + 1,c)
+                }(e, b, s, f, p);
+            if (o && !p && 2 === b.length && tL(b[1 ^ u]))
+                return b[1 ^ u];
+            if (o && p && 1 === b.length && tL(p))
+                return p;
+            var g = e && e === this.ownerID
+              , m = o ? p ? s : s ^ d : s | d
+              , y = o ? p ? tK(b, u, p, g) : function(e, t, a) {
+                var r = e.length - 1;
+                if (a && t === r)
+                    return e.pop(),
+                    e;
+                for (var n = Array(r), i = 0, c = 0; c < r; c++)
+                    c === t && (i = 1),
+                    n[c] = e[c + i];
+                return n
+            }(b, u, g) : function(e, t, a, r) {
+                var n = e.length + 1;
+                if (r && t + 1 === n)
+                    return e[t] = a,
+                    e;
+                for (var i = Array(n), c = 0, f = 0; f < n; f++)
+                    f === t ? (i[f] = a,
+                    c = -1) : i[f] = e[f + c];
+                return i
+            }(b, u, p, g);
+            return g ? (this.bitmap = m,
+            this.nodes = y,
+            this) : new tR(e,m,y)
+        }
+        ;
+        var tP = function(e, t, a) {
+            this.ownerID = e,
+            this.count = t,
+            this.nodes = a
+        };
+        tP.prototype.get = function(e, t, a, r) {
+            void 0 === t && (t = ev(a));
+            var n = (0 === e ? t : t >>> e) & 31
+              , i = this.nodes[n];
+            return i ? i.get(e + 5, t, a, r) : r
+        }
